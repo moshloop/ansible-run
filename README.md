@@ -2,6 +2,11 @@
 
 A wrapper that runs ansible in a docker container to eliminate python dependency hell.
 
+```bash
+pip install git+https://github.com/moshloop/ansible-runner.git
+ansible-runner
+```
+
 Supports:
 
 * AWS
