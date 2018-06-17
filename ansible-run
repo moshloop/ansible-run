@@ -1,0 +1,30 @@
+#!/bin/bash
+ARGS=""
+for ARG in $(compgen -e); do
+    if [[ "$ARG}" == "AWS_"* ]]; then
+        ARGS+=" -e $ARG=${!ARG}"
+    fi
+done
+
+ARGS+=" --volume ssh:/ssh --env SSH_AUTH_SOCK=/ssh/auth/sock"
+if [[ -e ~/.ansible ]]; then
+    ARGS+=" -v $HOME/.ansible:/root/.ansible"
+fi
+
+if [[ -e ~/.aws ]]; then
+    ARGS+=" -v $HOME/.aws:/root/.aws"
+fi
+
+if [[ -e /work ]]; then
+    ARGS+=" -v /work:/work "
+fi
+
+if [[ -e /var/run/docker.sock ]];  then
+    ARGS+=" -v /var/run/docker.sock:/var/run/docker.sock"
+fi
+
+if [[ "$DEBUG" == "true" ]]; then
+    echo docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/ansible-run bash -c "$@"
+fi
+
+docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/ansible-run bash -c "$@"

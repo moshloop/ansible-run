@@ -1,0 +1,122 @@
+#!/bin/bash
+#
+# Ansible playbook testing script
+#
+# Usage: [OPTIONS] ansible-test PLAYBOOK [TAGS]
+# OPTIONS:
+#   - distro: a supported Docker distro version (default = "centos7")
+#   - cleanup: whether to remove the Docker container (default = true)
+#   - container_id: the --name to set for the container (default = timestamp)
+#   - test_idempotence: whether to test playbook's idempotence (default = true)
+#   - image: The testing container to use (default = moshloop/centos-systemd)
+#
+# License: MIT
+
+# Exit on any individual command failure.
+set -e
+
+# Pretty colors.
+red="\033[38;5;196m"
+green="\033[38;5;46m"
+neutral='\033[0m'
+timestamp=$(date +%s)
+image=${image:-"moshloop/centos-systemd"}
+
+get_args() {
+  ARGS="--privileged"
+  # passthrough AWS variables
+  for ARG in $(compgen -e); do
+      if [[ "$ARG}" == "AWS_"* ]]; then
+          ARGS+=" -e $ARG=${!ARG}"
+      fi
+  done
+  if [[ -e ~/.aws ]]; then
+      ARGS+=" -v $HOME/.aws:/root/.aws"
+  fi
+
+  ARGS+=" --volume ssh:/ssh --env SSH_AUTH_SOCK=/ssh/auth/sock"
+  if [[ -e ~/.ansible ]]; then
+      ARGS+=" -v $HOME/.ansible:/root/.ansible"
+  fi
+
+  if [[ -e /work ]]; then
+      ARGS+=" -v /work:/work "
+  fi
+
+  if [[ -e /var/run/docker.sock ]];  then
+      ARGS+=" -v /var/run/docker.sock:/var/run/docker.sock"
+  fi
+  echo $ARGS
+
+}
+
+# Allow environment variables to override defaults.
+distro=${distro:-"ubuntu1604"}
+playbook=${playbook:-$1}
+tags=${2:-""}
+if [ "$tags" == "" ]; then
+  tags=all
+fi
+cleanup=${cleanup:-"true"}
+timestamp=$(date +"%Y%m%dT%H%M%S")
+container_id=${container_id:-$timestamp}
+test_idempotence=${test_idempotence:-"true"}
+
+# Run the container using the supplied OS.
+printf ${green}"Starting background container: ${neutral}"$container_id"\n"
+echo docker run --detach --name $container_id $(get_args) $image
+docker run --detach --name $container_id $(get_args) $image
+EXEC="docker exec -w $PWD --tty $container_id env TERM=xterm "
+PLAYBOOK="$EXEC ANSIBLE_FORCE_COLOR=1 ansible-playbook "
+
+printf "\n"
+
+# Install requirements if `requirements.yml` is present.
+if [ -f "$PWD/tests/requirements.yml" ]; then
+  printf ${green}"Requirements file detected; installing dependencies."${neutral}"\n"
+  $EXEC ansible-galaxy install -r  $PWD/tests/requirements.yml
+fi
+
+printf "\n"
+
+if [[ "$1" == "" ]]; then
+    # docker exec sometimes messes up the terminal dimesnsions so we need to record and pass them through
+  width=$(stty size | cut -d" " -f2)
+  height=$(stty size | cut -d" " -f1)
+  tty_opts=$(stty -g)
+  ARGS=" -e tty_width=$width -e tty_height=$height -e tty_opts=$tty_opts -e cid=$container_id"
+  docker exec  $ARGS -it $container_id /etc/entrypoint.sh
+  exit 0
+fi
+
+# Test Ansible syntax.
+printf ${green}"Checking Ansible playbook syntax: "${neutral}
+printf "$PLAYBOOK $playbook --syntax-check"
+$PLAYBOOK $playbook --syntax-check
+
+printf "\n"
+
+# Run Ansible playbook.
+printf ${green}"Running command: ${neutral} $PLAYBOOK $playbook"
+$PLAYBOOK $playbook -t $tags
+
+if [[ -e $playbook.rb ]]; then
+  $EXEC inspec exec $playbook.rb
+fi
+
+if [ "$test_idempotence" = true ]; then
+  # Run Ansible playbook again (idempotence test).
+  printf ${green}"Running idempotence test"${neutral}
+  idempotence=$(mktemp)
+  $PLAYBOOK $playbook | tee -a $idempotence
+  tail $idempotence \
+    | grep -q 'changed=0.*failed=0' \
+    && (printf "Idempotence test: ${green}pass"${neutral}"\n") \
+    || (printf 'Idempotence test: ${red}fail'${neutral}"\n" && exit 1)
+fi
+
+# Remove the Docker container (if configured).
+if [ "$cleanup" = true ]; then
+  printf "Removing Docker container...\n"
+  docker rm -f $container_id
+fi
