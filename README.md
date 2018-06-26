@@ -1,28 +1,52 @@
 # Ansible Runner
 
-A wrapper that runs ansible in a docker container to eliminate python dependency hell.
+A wrapper that runs ansible in a docker container to eliminate python dependency hell, bundles the dependencies needed for the following modules:
 
+* aws
+* azure
+* vmware
+* bigip
+* panos
+* win
+
+### ansible-run
 ```bash
-pip install git+https://github.com/moshloop/ansible-runner.git
-ansible-runner
+pip install ansible-run
+ansible-run
+# drop into a shell with ansible and friends pre-installed
 ```
 
-Supports:
+**Environment Variables:**.
+* `AWS_*` environment variables
+*
 
-* AWS
-    - Any `AWS_*` environment variables will be passed through
-    - `~/.aws` will be mounted
-* Palo Alto
-* WinRM (Kerberos + CredSSP)
-* Fireviz
-* Kops
+**Volumes:**.
+* `/ssh` (for use with [whilp/ssh-agent](https://github.com/whilp/ssh-agent))
+* `/var/run/docker.sock` (so that docker can talk to itself)
+* `~/.aws`
+* '~/.ansible'
+* `/work`
+* `$PWD`
 
+### ansible-role
+```bash
+ansible-role moshloop.java # cross-platform install of java
+```
 
-### ssh-agent
+### ansible-test
 
-Works well with [whilp/ssh-agent](https://github.com/whilp/ssh-agent) to keep allow ansible access to `ssh-agent`
+`ansible-test` will test a playbook using a docker container:
 
 ```bash
-docker run -u 1001 -d -v ssh:/ssh --name=ssh-agent whilp/ssh-agent:latest
-docker run -u 1001 --rm -v ssh:/ssh -v $HOME:$HOME -it whilp/ssh-agent:latest ssh-add $HOME/.ssh/id_rsa
+ansible-test playbook.yml # defaults to centos7
+image=ubuntu1804 ansible-test playbook.yml
 ```
+
+The playbook will be tested for idempotency by running it a 2nd time and ensuring nothing is marked as changed, disable it with:
+```bash
+idempotency=false ansible-test playbook.yml
+```
+
+Once the playbook is run any InSpec tests found with the same name (e.g. `playbook.rb`) will be executed.
+
+See it in action [here](https://github.com/moshloop/ansible-java/tree/master/tests)

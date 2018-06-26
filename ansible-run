@@ -24,7 +24,7 @@ if [[ -e /var/run/docker.sock ]];  then
 fi
 
 if [[ "$DEBUG" == "true" ]]; then
-    echo docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/ansible-run bash -c "$@"
+    echo docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run bash -c "$@"
 fi
 
-docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/ansible-run bash -c "$@"
+docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run bash -c "$@"

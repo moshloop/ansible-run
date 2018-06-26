@@ -1,16 +1,15 @@
 #!/bin/bash
-#
-# Ansible playbook testing script
-#
-# Usage: [OPTIONS] ansible-test PLAYBOOK [TAGS]
-# OPTIONS:
-#   - distro: a supported Docker distro version (default = "centos7")
-#   - cleanup: whether to remove the Docker container (default = true)
-#   - container_id: the --name to set for the container (default = timestamp)
-#   - test_idempotence: whether to test playbook's idempotence (default = true)
-#   - image: The testing container to use (default = moshloop/centos-systemd)
-#
-# License: MIT
+
+if [[ "$1" == "--help" ]]; then
+    echo USAGE: [OPTIONS] ansible-test PLAYBOOK [TAGS]
+    echo  OPTIONS:
+    echo "  - image: The testing container to use, e.g. ubuntu1804,centos7,ubuntu1604,debian9 (default = centos7)"
+    echo "  - cleanup: whether to remove the Docker container (default = true)"
+    echo "  - container_id: the docker --name to set for the container (default = timestamp)"
+    echo "  - test_idempotence: whether to test playbooks idempotence (default = true)"
+    echo "  - image: The testing container to use (default = moshloop/centos-systemd)"
+    exit 0
+fi
 
 # Exit on any individual command failure.
 set -e
@@ -20,10 +19,19 @@ red="\033[38;5;196m"
 green="\033[38;5;46m"
 neutral='\033[0m'
 timestamp=$(date +%s)
-image=${image:-"moshloop/centos-systemd"}
+image=${image:-"moshloop/docker-centos7-ansible"}
+entrypoint=""
+
+if [[ "$image" != *"/"* ]]; then
+  image="moshloop/docker-$image-ansible"
+fi
+
+if [[ "$image" == "moshloop/docker-ubuntu1804-ansible" ]]; then
+    entrypoint="/lib/systemd/systemd"
+fi
 
 get_args() {
-  ARGS="--privileged"
+  ARGS="--privileged -w $PWD -v $PWD:$PWD"
   # passthrough AWS variables
   for ARG in $(compgen -e); do
       if [[ "$ARG}" == "AWS_"* ]]; then
@@ -34,7 +42,6 @@ get_args() {
       ARGS+=" -v $HOME/.aws:/root/.aws"
   fi
 
-  ARGS+=" --volume ssh:/ssh --env SSH_AUTH_SOCK=/ssh/auth/sock"
   if [[ -e ~/.ansible ]]; then
       ARGS+=" -v $HOME/.ansible:/root/.ansible"
   fi
@@ -43,15 +50,15 @@ get_args() {
       ARGS+=" -v /work:/work "
   fi
 
+  ARGS+=" --volume ssh:/ssh --env SSH_AUTH_SOCK=/ssh/auth/sock"
+
   if [[ -e /var/run/docker.sock ]];  then
       ARGS+=" -v /var/run/docker.sock:/var/run/docker.sock"
   fi
-  echo $ARGS
 
+  echo $ARGS
 }
 
-# Allow environment variables to override defaults.
-distro=${distro:-"ubuntu1604"}
 playbook=${playbook:-$1}
 tags=${2:-""}
 if [ "$tags" == "" ]; then
@@ -62,46 +69,42 @@ timestamp=$(date +"%Y%m%dT%H%M%S")
 container_id=${container_id:-$timestamp}
 test_idempotence=${test_idempotence:-"true"}
 
-# Run the container using the supplied OS.
-printf ${green}"Starting background container: ${neutral}"$container_id"\n"
-echo docker run --detach --name $container_id $(get_args) $image
-docker run --detach --name $container_id $(get_args) $image
+printf ${green}"Starting $image in the background: ${neutral}"$container_id"\n"
+echo docker run --detach --name $container_id $(get_args) $image $entrypoint
+docker run --detach --name $container_id $(get_args) $image $entrypoint
 EXEC="docker exec -w $PWD --tty $container_id env TERM=xterm "
 PLAYBOOK="$EXEC ANSIBLE_FORCE_COLOR=1 ansible-playbook "
 
 printf "\n"
 
-# Install requirements if `requirements.yml` is present.
 if [ -f "$PWD/tests/requirements.yml" ]; then
   printf ${green}"Requirements file detected; installing dependencies."${neutral}"\n"
-  $EXEC ansible-galaxy install -r  $PWD/tests/requirements.yml
+  $EXEC ansible-galaxy install -rc  $PWD/tests/requirements.yml
 fi
 
 printf "\n"
 
 if [[ "$1" == "" ]]; then
-    # docker exec sometimes messes up the terminal dimesnsions so we need to record and pass them through
+    # docker exec sometimes messes up the terminal dimensions so we need to record and pass them through
   width=$(stty size | cut -d" " -f2)
   height=$(stty size | cut -d" " -f1)
   tty_opts=$(stty -g)
   ARGS=" -e tty_width=$width -e tty_height=$height -e tty_opts=$tty_opts -e cid=$container_id"
-  docker exec  $ARGS -it $container_id /etc/entrypoint.sh
+  docker exec  $ARGS -it $container_id bash
   exit 0
 fi
 
-# Test Ansible syntax.
 printf ${green}"Checking Ansible playbook syntax: "${neutral}
-printf "$PLAYBOOK $playbook --syntax-check"
-$PLAYBOOK $playbook --syntax-check
+printf "$PLAYBOOK $pwd/$playbook --syntax-check"
+$PLAYBOOK $PWD/$playbook --syntax-check
 
 printf "\n"
 
-# Run Ansible playbook.
-printf ${green}"Running command: ${neutral} $PLAYBOOK $playbook"
-$PLAYBOOK $playbook -t $tags
+printf ${green}"Running command: ${neutral} $PLAYBOOK $PWD/$playbook"
+$PLAYBOOK $PWD/$playbook -t $tags
 
-if [[ -e $playbook.rb ]]; then
-  $EXEC inspec exec $playbook.rb
+if [[ -e ${playbook%.*}.rb ]]; then
+  $EXEC inspec exec ${playbook%.*}.rb  --reporter=cli junit:test/junit.xml
 fi
 
 if [ "$test_idempotence" = true ]; then
@@ -112,7 +115,7 @@ if [ "$test_idempotence" = true ]; then
   tail $idempotence \
     | grep -q 'changed=0.*failed=0' \
     && (printf "Idempotence test: ${green}pass"${neutral}"\n") \
-    || (printf 'Idempotence test: ${red}fail'${neutral}"\n" && exit 1)
+    || (printf "Idempotence test: ${red}fail"${neutral}"\n" && exit 1)
 fi
 
 # Remove the Docker container (if configured).
