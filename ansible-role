@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo - {hosts: all, roles: [$1]} > /tmp/play
+ansible-playbook -i 'localhost, ' -c local /tmp/play
+rm /tmp/play
