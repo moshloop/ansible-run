@@ -75,10 +75,25 @@ docker run --detach --name $container_id $(get_args) $image $entrypoint
 EXEC="docker exec --tty $container_id env TERM=xterm "
 PLAYBOOK="$EXEC ANSIBLE_FORCE_COLOR=1 ansible-playbook "
 
-printf "\n"
 
-if [ -f "$PWD/tests/requirements.yml" ]; then
-  printf ${green}"Requirements file detected; installing dependencies."${neutral}"\n"
+# extract and install role dependencies
+if [[ -e "$PWD/meta/main.yml" ]]; then
+  dependencies=$(cat $PWD/meta/main.yml | yq -cr .galaxy_info.dependencies)
+
+  if [[ "$dependencies" != "null" ]]; then
+    dependencies=$(echo $dependencies | jq -j '. | join(" ") ')
+  fi
+  if [[ "$dependencies" != "null"  ]]; then
+
+  printf ${green}"Installing role dependencies: "${neutral}" $dependencies\n"
+    $EXEC ansible-galaxy install $dependencies
+  fi
+fi
+
+
+requirements=$(dirname "$PWD/$playbook")"/requirements.yml"
+if [ -e "$requirements" ]; then
+  printf ${green}"Innstalling dependencies from: "${neutral}" $requirements \n"
   $EXEC ansible-galaxy install -rc  $PWD/tests/requirements.yml
 fi
 
