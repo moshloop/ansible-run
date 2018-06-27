@@ -72,7 +72,7 @@ test_idempotence=${test_idempotence:-"true"}
 printf ${green}"Starting $image in the background: ${neutral}"$container_id"\n"
 echo docker run --detach --name $container_id $(get_args) $image $entrypoint
 docker run --detach --name $container_id $(get_args) $image $entrypoint
-EXEC="docker exec -w $PWD --tty $container_id env TERM=xterm "
+EXEC="docker exec --tty $container_id env TERM=xterm "
 PLAYBOOK="$EXEC ANSIBLE_FORCE_COLOR=1 ansible-playbook "
 
 printf "\n"
@@ -90,7 +90,7 @@ if [[ "$1" == "" ]]; then
   height=$(stty size | cut -d" " -f1)
   tty_opts=$(stty -g)
   ARGS=" -e tty_width=$width -e tty_height=$height -e tty_opts=$tty_opts -e cid=$container_id"
-  docker exec  $ARGS -it $container_id bash
+  docker exec  $ARGS -it $container_id  bash -c "cd $PWD; bash"
   exit 0
 fi
 
@@ -104,14 +104,14 @@ printf ${green}"Running command: ${neutral} $PLAYBOOK $PWD/$playbook"
 $PLAYBOOK $PWD/$playbook -t $tags
 
 if [[ -e ${playbook%.*}.rb ]]; then
-  $EXEC inspec exec ${playbook%.*}.rb  --reporter=cli junit:test/junit.xml
+  $EXEC inspec exec $PWD/${playbook%.*}.rb  --reporter=cli junit:$PWD/junit.xml
 fi
 
 if [ "$test_idempotence" = true ]; then
   # Run Ansible playbook again (idempotence test).
   printf ${green}"Running idempotence test"${neutral}
   idempotence=$(mktemp)
-  $PLAYBOOK $playbook | tee -a $idempotence
+  $PLAYBOOK $PWD/$playbook | tee -a $idempotence
   tail $idempotence \
     | grep -q 'changed=0.*failed=0' \
     && (printf "Idempotence test: ${green}pass"${neutral}"\n") \
