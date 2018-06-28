@@ -1,12 +1,24 @@
 #!/bin/bash
 
 if [[ "$1" == "--help" || "$1" == "" ]]; then
-    echo "USAGE: ansible-role role"
-    echo "Executes an ansible role directly without requiring it be used within a playbook"
+    echo "USAGE: ansible-role install|develop role"
+    echo "install - executes an ansible role directly without requiring it be used within a playbook"
+    echo "develop - installs the role locally for use in other playbooks/roles"
     exit 0
-
 fi
-play=$(mktemp)
-echo - {hosts: all, roles: [$1]} > $play
-ansible-playbook -i 'localhost, ' -c local $play
-rm $play
+
+tmp=$(mktemp)
+
+if [[ "$1" == "develop" ]]; then
+    mkdir -p ~/.ansible/roles
+    if [[ -e "~/.ansible/roles/$2" ]]; then
+        rm -rf ~/.ansible/roles/$2
+    fi
+    ln -s $PWD ~/.ansible/roles/$2
+elif [[ "$1" == "install" ]]; then
+    echo - {hosts: all, roles: [$1]} > $tmp
+    ansible-playbook -i 'localhost, ' -c local $tmp
+else
+    echo "Unknown command $1"
+fi
+rm $tmp

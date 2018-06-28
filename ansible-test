@@ -122,6 +122,10 @@ if [[ -e ${playbook%.*}.rb ]]; then
   $EXEC inspec exec $PWD/${playbook%.*}.rb  --reporter=cli junit:$PWD/junit.xml
 fi
 
+if [[ -e ${playbook%.*}.bats ]]; then
+  $EXEC bats $PWD/${playbook%.*}.bats
+fi
+
 if [ "$test_idempotence" = true ]; then
   # Run Ansible playbook again (idempotence test).
   printf ${green}"Running idempotence test"${neutral}

@@ -16,15 +16,14 @@ ansible-run
 # drop into a shell with ansible and friends pre-installed
 ```
 
-**Environment Variables:**.
+**Environment Variables:**
 * `AWS_*` environment variables
-*
 
-**Volumes:**.
+**Volumes:**
 * `/ssh` (for use with [whilp/ssh-agent](https://github.com/whilp/ssh-agent))
 * `/var/run/docker.sock` (so that docker can talk to itself)
 * `~/.aws`
-* '~/.ansible'
+* `~/.ansible`
 * `/work`
 * `$PWD`
 
@@ -47,6 +46,6 @@ The playbook will be tested for idempotency by running it a 2nd time and ensurin
 idempotency=false ansible-test playbook.yml
 ```
 
-Once the playbook is run any InSpec tests found with the same name (e.g. `playbook.rb`) will be executed.
+Once the playbook is run any [InSpec](https://www.inspec.io) (.rb) or [bats](https://github.com/sstephenson/bats) (.bats) tests found with the same name (e.g. `playbook.rb`) will be executed.
 
 See it in action [here](https://github.com/moshloop/ansible-java/tree/master/tests)
