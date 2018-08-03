@@ -54,6 +54,8 @@ get_args() {
 
   if [[ -e /var/run/docker.sock ]];  then
       ARGS+=" -v /var/run/docker.sock:/var/run/docker.sock"
+      ARGS+=" -v /var/run/docker.sock:/tmp/var/run/docker.sock"
+      ARGS+=" -e DOCKER_HOST=unix:///tmp/var/run/docker.sock"
   fi
 
   echo $ARGS

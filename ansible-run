@@ -7,6 +7,7 @@ for ARG in $(compgen -e); do
 done
 
 ARGS+=" --volume ssh:/ssh --env SSH_AUTH_SOCK=/ssh/auth/sock"
+ARGS+=" -e USER=$(whoami)"
 if [[ -e ~/.ansible ]]; then
     ARGS+=" -v $HOME/.ansible:/root/.ansible"
 fi
@@ -24,7 +25,12 @@ if [[ -e /var/run/docker.sock ]];  then
 fi
 
 if [[ "$DEBUG" == "true" ]]; then
-    echo docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run bash -c "$@"
+    echo docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run "$@"
 fi
 
-docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run bash -c "$@"
+if [[ "$@" == "" ]]; then
+    ARGS="$ARGS --entrypoint /bin/bash"
+else
+    ARGS="$ARGS --entrypoint /usr/local/bin/ansible-playbook"
+fi
+docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run $@
