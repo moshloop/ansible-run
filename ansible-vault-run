@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [[ "$1" == "--help" || "$1" == "" ]]; then
+    echo "USAGE: ansible-vault-run vault script"
+    echo "Decrypts an ansible-vault and runs script with the contents as environment variables"
+    echo "e.g. ansible-vault-run vault \"echo \$password\""
+    exit 0
+fi
+
+vault=$1
+shift
+script="$@"
+
+IFS=$'\n'
+for line in $(ansible-vault view $vault); do
+
+    if [[ "$line" == '-'* || "$line" == '#'*  ]]; then
+        continue
+    fi
+    key=$(echo $line | cut -d: -f1)
+    value=$(echo $line | cut -d: -f2)
+
+    eval export $key=${value## }
+done
+eval $script

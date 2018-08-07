@@ -49,3 +49,11 @@ idempotency=false ansible-test playbook.yml
 Once the playbook is run any [InSpec](https://www.inspec.io) (.rb) or [bats](https://github.com/sstephenson/bats) (.bats) tests found with the same name (e.g. `playbook.rb`) will be executed.
 
 See it in action [here](https://github.com/moshloop/ansible-java/tree/master/tests)
+
+### ansible-vault-run
+
+`ansible-vault-run` will decrypt a vault and run a script with the variables exported as environment variables
+    echo "Decrypts an ansible-vault and runs script with the contents as environment variables"
+```bash
+ansible-vault-run vault "echo \$password"
+```
