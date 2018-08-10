@@ -13,7 +13,7 @@ shift
 if ansible-galaxy list $role | grep "not found"  2>&1 > /dev/null; then
     ansible-galaxy install $role
 fi
-echo - {hosts: all, become: yes, roles: [$role]} > $tmp
+echo - {hosts: localhost, become: yes, roles: [$role]} > $tmp
 ansible-playbook $tmp $@
 
 rm $tmp
