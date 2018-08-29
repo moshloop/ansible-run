@@ -7,7 +7,7 @@ if [[ "$1" == "--help" ]]; then
     echo "  - cleanup: whether to remove the Docker container (default = true)"
     echo "  - container_id: the docker --name to set for the container (default = timestamp)"
     echo "  - test_idempotence: whether to test playbooks idempotence (default = true)"
-    echo "  - image: The testing container to use (default = moshloop/centos-systemd)"
+    echo "  - image: The testing container to use (default = moshloop//docker-centos7-ansible)"
     exit 0
 fi
 
@@ -34,7 +34,7 @@ get_args() {
   ARGS="--privileged -w $PWD -v $PWD:$PWD"
   # passthrough AWS variables
   for ARG in $(compgen -e); do
-      if [[ "$ARG}" == "AWS_"* ]]; then
+      if [[ "$ARG" == "AWS_"* && "$ARG" == "ANSIBLE_"*  ]]; then
           ARGS+=" -e $ARG=${!ARG}"
       fi
   done
