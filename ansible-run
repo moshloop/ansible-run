@@ -1,7 +1,7 @@
 #!/bin/bash
 ARGS=""
 for ARG in $(compgen -e); do
-    if [[ "$ARG}" == "AWS_"* || "$ARG}" == "ANSIBLE_"* ]]; then
+    if [[ "$ARG" == "AWS_"* || "$ARG" == "ANSIBLE_"* ]]; then
         ARGS+=" -e $ARG=${!ARG}"
     fi
 done
