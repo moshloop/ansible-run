@@ -3,6 +3,7 @@ repo_name: Ansible Run
 site_name: Ansible Run
 theme: material
 nav:
+  - Getting Started: ./index.md
   - ansible-run: ./ansible-run.md
   - ansible-test: ./ansible-test.md
   - ansible-vault-run: ./ansible-vault-run.md
