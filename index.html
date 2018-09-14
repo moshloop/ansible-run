@@ -31,21 +31,21 @@
       
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
-      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <link rel="shortcut icon" href="assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.4">
     
     
       
-        <title>ansible-vault-run - Ansible Run</title>
+        <title>Ansible Run</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+      <link rel="stylesheet" href="assets/stylesheets/application.451f80e5.css">
       
       
     
     
-      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+      <script src="assets/javascripts/modernizr.1aa3b519.js"></script>
     
     
       
@@ -54,7 +54,7 @@
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
     
-    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    <link rel="stylesheet" href="assets/fonts/material-icons.css">
     
     
   </head>
@@ -95,7 +95,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Ansible Run" class="md-header-nav__button md-logo">
+        <a href="." title="Ansible Run" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -112,7 +112,7 @@
                 Ansible Run
               </span>
               <span class="md-header-nav__topic">
-                ansible-vault-run
+                Getting Started
               </span>
             
           
@@ -191,7 +191,7 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="Ansible Run" class="md-nav__button md-logo">
+    <a href="." title="Ansible Run" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
@@ -227,11 +227,18 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href=".." title="Getting Started" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+    <a href="." title="Getting Started" class="md-nav__link md-nav__link--active">
       Getting Started
     </a>
+    
   </li>
 
     
@@ -241,7 +248,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../ansible-run/" title="ansible-run" class="md-nav__link">
+    <a href="ansible-run/" title="ansible-run" class="md-nav__link">
       ansible-run
     </a>
   </li>
@@ -253,7 +260,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../ansible-test/" title="ansible-test" class="md-nav__link">
+    <a href="ansible-test/" title="ansible-test" class="md-nav__link">
       ansible-test
     </a>
   </li>
@@ -263,18 +270,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-    
-    <a href="./" title="ansible-vault-run" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="ansible-vault-run/" title="ansible-vault-run" class="md-nav__link">
       ansible-vault-run
     </a>
-    
   </li>
 
     
@@ -290,15 +290,22 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/moshloop/ansible-run/edit/master/docs/ansible-vault-run.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/moshloop/ansible-run/edit/master/docs/index.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>ansible-vault-run</h1>
+                  <h1>Getting Started</h1>
                 
-                <p><code>ansible-vault-run</code> will decrypt a vault and run a script with the variables exported as environment variables
-    echo "Decrypts an ansible-vault and runs script with the contents as environment variables"
-<div class="codehilite"><pre><span></span>ansible-vault-run vault <span class="s2">&quot;echo \$password&quot;</span>
-</pre></div></p>
+                <p>ansible-run a suite of CLI tools for running ansible in a docker container to eliminate python dependency hell. It bundles dependencies needed for the following modules:</p>
+<ul>
+<li>aws</li>
+<li>azure</li>
+<li>bigip</li>
+<li>dig</li>
+<li>docker</li>
+<li>panos</li>
+<li>vmware</li>
+<li>win</li>
+</ul>
                 
                   
                 
@@ -319,20 +326,20 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../ansible-test/" title="ansible-test" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
+        
+          <a href="ansible-run/" title="ansible-run" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
-                  Previous
+                  Next
                 </span>
-                ansible-test
+                ansible-run
               </span>
             </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
           </a>
-        
         
       </nav>
     </div>
@@ -356,9 +363,9 @@
       
     </div>
     
-      <script src="../assets/javascripts/application.583bbe55.js"></script>
+      <script src="assets/javascripts/application.583bbe55.js"></script>
       
-      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      <script>app.initialize({version:"1.0.4",url:{base:"."}})</script>
       
     
     
