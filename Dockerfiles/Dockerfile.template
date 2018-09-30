@@ -1,0 +1,20 @@
+FROM %FROM%
+ARG ANSIBLE_VERSION
+ARG SYSTOOLS_VERSION
+ARG PACKAGES
+ENV DEBIAN_FRONTEND=noninteractive
+ADD ansible.cfg /etc/ansible/ansible.cfg
+ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    $PACKAGES && \
+    rm -rf /var/lib/apt/lists/*  && \
+    rm -Rf /usr/share/doc && rm -Rf /usr/share/man && \
+    apt-get clean
+RUN pip install wheel && \
+    pip install \
+    ansible==$ANSIBLE_VERSION ansible-run ansible-dependencies[all] && \
+    wget -O systools.deb https://github.com/moshloop/systools/releases/download/$SYSTOOLS_VERSION/systools_${SYSTOOLS_VERSION}_amd64.deb && dpkg -i systools.deb && \
+    install_bin https://master.dockerproject.org/linux/x86_64/docker \
+                https://github.com/moshloop/waiter/releases/download/1.1/waiter && \
+    install_deb https://packages.chef.io/files/stable/inspec/2.2.20/ubuntu/18.04/inspec_2.2.20-1_amd64.deb
+ENTRYPOINT ["/usr/local/bin/ansible-playbook"]

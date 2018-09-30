@@ -1,3 +1,6 @@
+sudo: required
+services:
+  - docker
 language: python
 python:
   - 3.6.5
@@ -7,6 +10,7 @@ script:
   - git remote add docs "https://$GH_TOKEN@github.com/moshloop/ansible-run.git"
   - git fetch docs && git fetch docs gh-pages:gh-pages
   - mkdocs gh-deploy -v --remote-name docs
+  - make
 
 deploy:
   - provider: pypi
