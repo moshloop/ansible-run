@@ -4,10 +4,10 @@ services:
 language: python
 env:
   - docs=true
-  - BASE=ubuntu:16.04 IMAGE=moshloop/docker-ubuntu1604-ansible
-  - BASE=ubuntu:18.04 IMAGE=moshloop/docker-ubuntu1804-ansible
-  - BASE=debian:stretch IMAGE=moshloop/docker-debian-ansible
-  - BASE=centos:7 IMAGE=moshloop/docker-centos7-ansible
+  - BASE=ubuntu:16.04 IMAGE=moshloop/docker-ubuntu1604-ansible os=ubuntu
+  - BASE=ubuntu:18.04 IMAGE=moshloop/docker-ubuntu1804-ansible os=ubuntu
+  - BASE=debian:stretch IMAGE=moshloop/docker-debian-ansible os=ubuntu
+  - BASE=centos:7 IMAGE=moshloop/docker-centos7-ansible os=centos
 
 python:
   - 3.6.5
@@ -20,7 +20,7 @@ script:
       git fetch docs && git fetch docs gh-pages:gh-pages
       mkdocs gh-deploy -v --remote-name docs
     else
-      cd Dockerfiles && make
+      cd Dockerfiles && make $os
     fi
 
 deploy:

@@ -11,20 +11,25 @@ IMAGE ?= moshloop/ansible-run
 BASE ?= ubuntu:18.04
 
 .PHONY: push
-push: build
+push: *
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
 	docker tag $(IMAGE) $(IMAGE):$(tag)
 	docker push $(IMAGE):$(tag)
 	docker tag $(IMAGE) $(IMAGE):latest
 	docker push $(IMAGE):latest
 
-.PHONY: build
-build:
-	$(shell cat Dockerfile.template | sed 's/%FROM%/$(BASE)/' > Dockerfile)
+.PHONY: ubuntu
+ubuntu: *
+	$(shell cat Dockerfile.ubuntu | sed 's/%FROM%/$(BASE)/' > Dockerfile)
 	 docker build ./ -t $(IMAGE) --build-arg ANSIBLE_VERSION=$(ANSIBLE_VERSION) --build-arg SYSTOOLS_VERSION=$(SYSTOOLS_VERSION)  --build-arg PACKAGES="$(shell cat ubuntu-packages.txt | tr '\r\n' ' ')"
+	 make push
 
-.PHONY: all
-all: *
+PHONY: centos
+centos: *
+		$(shell cat Dockerfile.centos | sed 's/%FROM%/$(BASE)/' > Dockerfile)
+	 docker build ./ -t $(IMAGE) --build-arg ANSIBLE_VERSION=$(ANSIBLE_VERSION) --build-arg SYSTOOLS_VERSION=$(SYSTOOLS_VERSION)  --build-arg PACKAGES="$(shell cat centos-packages.txt | tr '\r\n' ' ')"
+	 make push
+
 	make BASE=ubuntu:16.04 IMAGE=moshloop/docker-ubuntu1604-ansible
 	make BASE=ubuntu:18.04 IMAGE=moshloop/docker-ubuntu1604-ansible
 	make BASE=debian:stretch IMAGE=moshloop/docker-debian-ansible
