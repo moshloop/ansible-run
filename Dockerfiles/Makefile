@@ -5,10 +5,10 @@ else
 endif
 
 .DEFAULT_GOAL := push
-ANSIBLE_VERSION := 2.6.5
-SYSTOOLS_VERSION := 3.1
-IMAGE := moshloop/ansible-run
-BASE := ubuntu:18.04
+ANSIBLE_VERSION ?= 2.6.5
+SYSTOOLS_VERSION ?= 3.1
+IMAGE ?= moshloop/ansible-run
+BASE ?= ubuntu:18.04
 
 .PHONY: push
 push: build
