@@ -2,15 +2,26 @@ sudo: required
 services:
   - docker
 language: python
+env:
+  - docs=true
+  - BASE=ubuntu:16.04 IMAGE=moshloop/docker-ubuntu1604-ansible
+  - BASE=ubuntu:18.04 IMAGE=moshloop/docker-ubuntu1804-ansible
+  - BASE=debian:stretch IMAGE=moshloop/docker-debian-ansible
+  - BASE=centos:7 IMAGE=moshloop/docker-centos7-ansible
+
 python:
   - 3.6.5
 script:
-  - python setup.py sdist
-  - pip install mkdocs mkdocs-material pymdown-extensions Pygments
-  - git remote add docs "https://$GH_TOKEN@github.com/moshloop/ansible-run.git"
-  - git fetch docs && git fetch docs gh-pages:gh-pages
-  - mkdocs gh-deploy -v --remote-name docs
-  - cd Dockerfiles && make all
+  - |
+    if [[ "$docs" == "true" ]]; then
+      python setup.py sdist
+      pip install mkdocs mkdocs-material pymdown-extensions Pygments
+      git remote add docs "https://$GH_TOKEN@github.com/moshloop/ansible-run.git"
+      git fetch docs && git fetch docs gh-pages:gh-pages
+      mkdocs gh-deploy -v --remote-name docs
+    else
+      cd Dockerfiles && make
+    fi
 
 deploy:
   - provider: pypi
