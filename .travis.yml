@@ -5,6 +5,8 @@ language: python
 env:
   - docs=true
   - BASE=ubuntu:16.04 IMAGE=moshloop/docker-ubuntu1604-ansible os=ubuntu
+  - BASE=ubuntu:16.04 IMAGE=moshloop/ansible-run os=ubuntu
+  - BASE=ubuntu:16.04 IMAGE=moshloop/docker-ansible-run os=ubuntu
   - BASE=ubuntu:18.04 IMAGE=moshloop/docker-ubuntu1804-ansible os=ubuntu
   - BASE=debian:stretch IMAGE=moshloop/docker-debian-ansible os=ubuntu
   - BASE=centos:7 IMAGE=moshloop/docker-centos7-ansible os=centos
