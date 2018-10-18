@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*  && \
     rm -Rf /usr/share/doc && rm -Rf /usr/share/man && \
     apt-get clean
-RUN pip install --upgrade pip && pip install --upgrade setuptools wheel && \
+RUN pip install --upgrade setuptools wheel && \
     pip install ansible==$ANSIBLE_VERSION ansible-dependencies[all] && \
     pip install ansible-run ansible-deploy && \
     wget -O systools.deb https://github.com/moshloop/systools/releases/download/$SYSTOOLS_VERSION/systools_${SYSTOOLS_VERSION}_amd64.deb && dpkg -i systools.deb && \
