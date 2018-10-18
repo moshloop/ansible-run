@@ -21,7 +21,9 @@ RUN yum makecache fast \
  && yum -y install $PACKAGES \
  && yum clean all
 
-RUN pip install --upgrade pip && pip install --upgrade setuptools && pip install ansible==$ANSIBLE_VERSION ansible-dependencies[all]
+RUN pip install --upgrade pip && pip install --upgrade setuptools wheel && \
+    pip install ansible==$ANSIBLE_VERSION ansible-dependencies[all] && \
+    pip install ansible-run ansible-deploy
 RUN rpm -i https://packages.chef.io/files/stable/inspec/2.3.4/el/7/inspec-2.3.4-1.el7.x86_64.rpm && \
     rpm -i https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools-${SYSTOOLS_VERSION}-1.x86_64.rpm
 RUN install_bin https://github.com/moshloop/waiter/releases/download/1.1/waiter \

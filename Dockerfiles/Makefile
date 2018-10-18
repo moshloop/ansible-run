@@ -29,7 +29,3 @@ centos: *
 		$(shell cat Dockerfile.centos | sed 's/%FROM%/$(BASE)/' > Dockerfile)
 	 docker build ./ -t $(IMAGE) --build-arg ANSIBLE_VERSION=$(ANSIBLE_VERSION) --build-arg SYSTOOLS_VERSION=$(SYSTOOLS_VERSION)  --build-arg PACKAGES="$(shell cat centos-packages.txt | tr '\r\n' ' ')"
 	 make push
-
-	make BASE=ubuntu:16.04 IMAGE=moshloop/docker-ubuntu1604-ansible
-	make BASE=ubuntu:18.04 IMAGE=moshloop/docker-ubuntu1604-ansible
-	make BASE=debian:stretch IMAGE=moshloop/docker-debian-ansible
