@@ -28,9 +28,11 @@ if [[ "$DEBUG" == "true" ]]; then
     echo docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run "$@"
 fi
 
+ENTRYPOINT=${ENTRYPOINT:-/usr/local/bin/ansible-playbook}
+
 if [[ "$@" == "" ]]; then
     ARGS="$ARGS --entrypoint /bin/bash"
 else
-    ARGS="$ARGS --entrypoint /usr/local/bin/ansible-playbook"
+    ARGS="$ARGS --entrypoint $ENTRYPOINT"
 fi
 docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run $@
