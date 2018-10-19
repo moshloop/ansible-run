@@ -6,7 +6,7 @@ endif
 
 .DEFAULT_GOAL := push
 ANSIBLE_VERSION ?= 2.6.5
-SYSTOOLS_VERSION ?= 3.3
+SYSTOOLS_VERSION ?= 3.3.2
 IMAGE ?= moshloop/ansible-run
 BASE ?= ubuntu:18.04
 
