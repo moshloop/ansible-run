@@ -13,6 +13,7 @@ gzip
 jq
 krb5-devel
 krb5-libs
+lsof
 nano
 net-tools
 nmap-ncat
