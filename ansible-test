@@ -6,8 +6,8 @@ if [[ "$1" == "--help" ]]; then
     echo "  - image: The testing container to use, e.g. ubuntu1804,centos7,ubuntu1604,debian9 (default = centos7)"
     echo "  - cleanup: whether to remove the Docker container (default = true)"
     echo "  - container_id: the docker --name to set for the container (default = timestamp)"
-    echo "  - test_idempotence: whether to test playbooks idempotence (default = true)"
-    echo "  - image: The testing container to use (default = moshloop//docker-centos7-ansible)"
+    echo "  - test_idempotence: whether to test playbooks idempotence (default = false)"
+    echo "  - image: The testing container to use (default = moshloop/docker-centos7-ansible)"
     exit 0
 fi
 
@@ -68,15 +68,20 @@ if [ "$tags" == "" ]; then
 fi
 cleanup=${cleanup:-"true"}
 timestamp=$(date +"%Y%m%dT%H%M%S")
-container_id=${container_id:-$timestamp}
-test_idempotence=${test_idempotence:-"true"}
+test_idempotence=${test_idempotence:-"false"}
+docker_image=$(grep  DOCKER_IMAGE /etc/os-release  | cut -d= -f2)
 
-printf ${green}"Starting $image in the background: ${neutral}"$container_id"\n"
-echo docker run --detach --name $container_id $(get_args) $image $entrypoint
-docker run --detach --name $container_id $(get_args) $image $entrypoint
-EXEC="docker exec --tty $container_id env TERM=xterm "
-PLAYBOOK="$EXEC ANSIBLE_FORCE_COLOR=1 ansible-playbook "
+if [[ "$docker_image" == "ansible-test" ]]; then
+  printf ${green}"Already running inside an ansible-test image"${neutral}"\n"
+  EXEC="env "
+else
+  container_id=${container_id:-$timestamp}
+  printf ${green}"Starting $image in the background: ${neutral}"$container_id"\n"
+  docker run --detach --name $container_id $(get_args) $image $entrypoint
+  EXEC="docker exec --tty $container_id env TERM=xterm "
+fi
 
+PLAYBOOK="$EXEC ANSIBLE_FORCE_COLOR=1 ANSIBLE_RETRY_FILES_ENABLED=false ansible-playbook "
 
 # extract and install role dependencies
 if [[ -e "$PWD/meta/main.yml" ]]; then
@@ -86,8 +91,7 @@ if [[ -e "$PWD/meta/main.yml" ]]; then
     dependencies=$(echo $dependencies | jq -j '. | join(" ") ')
   fi
   if [[ "$dependencies" != "null"  ]]; then
-
-  printf ${green}"Installing role dependencies: "${neutral}" $dependencies\n"
+    printf ${green}"Installing role dependencies: "${neutral}" $dependencies\n"
     $EXEC ansible-galaxy install $dependencies
   fi
 fi
@@ -95,14 +99,14 @@ fi
 
 requirements=$(dirname "$PWD/$playbook")"/requirements.yml"
 if [ -e "$requirements" ]; then
-  printf ${green}"Innstalling dependencies from: "${neutral}" $requirements \n"
+  printf ${green}"Installing dependencies from: "${neutral}" $requirements \n"
   $EXEC ansible-galaxy install -rc  $PWD/tests/requirements.yml
 fi
 
 printf "\n"
 
 if [[ "$1" == "" ]]; then
-    # docker exec sometimes messes up the terminal dimensions so we need to record and pass them through
+  # docker exec sometimes messes up the terminal dimensions so we need to record and pass them through
   width=$(stty size | cut -d" " -f2)
   height=$(stty size | cut -d" " -f1)
   tty_opts=$(stty -g)
@@ -128,6 +132,10 @@ if [[ -e ${playbook%.*}.bats ]]; then
   $EXEC bats $PWD/${playbook%.*}.bats
 fi
 
+if [[ -e ${playbook%.*}.goss.yml ]]; then
+  $EXEC goss -g $PWD/${playbook%.*}.goss.yml v
+fi
+
 if [ "$test_idempotence" = true ]; then
   # Run Ansible playbook again (idempotence test).
   printf ${green}"Running idempotence test"${neutral}
@@ -140,7 +148,7 @@ if [ "$test_idempotence" = true ]; then
 fi
 
 # Remove the Docker container (if configured).
-if [ "$cleanup" = true ]; then
+if [[ "$cleanup" == "true" && "$container_id" != "" ]]; then
   printf "Removing Docker container...\n"
   docker rm -f $container_id
 fi
