@@ -11,7 +11,7 @@ ANSIBLE_DEPLOY_VERSION ?= 2.5.4
 ANSIBLE_RUN_VERSION ?= 3.3
 ANSIBLE_VERSION ?= 2.6.5
 SYSTOOLS_VERSION ?= 3.4
-IMAGE ?= moshloop/ansible-run
+IMAGE ?= moshloop/ansible-docker-run
 BASE ?= ubuntu:18.04
 
 .PHONY: push
