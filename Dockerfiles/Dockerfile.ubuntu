@@ -19,9 +19,11 @@ RUN pip install --upgrade setuptools wheel && \
     pip install ansible-run==$ANSIBLE_RUN_VERSION && \
     wget -O systools.deb https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools.deb && dpkg -i systools.deb && \
     install_bin https://master.dockerproject.org/linux/x86_64/docker \
-                https://github.com/moshloop/waiter/releases/download/1.1/waiter && \
+                https://github.com/moshloop/waiter/releases/download/1.1/waiter \
+                https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz && \
     install_deb https://packages.chef.io/files/stable/inspec/2.2.20/ubuntu/18.04/inspec_2.2.20-1_amd64.deb && \
     install_deb https://github.com/moshloop/ansible-extras/releases/download/$ANSIBLE_EXTRAS_VERSION/ansible-extras.deb && \
-    env bin_name=goss install_bin https://github.com/aelsabbahy/goss/releases/download/v0.3.6/goss-linux-amd64
+    env bin_name=goss install_bin https://github.com/aelsabbahy/goss/releases/download/v0.3.6/goss-linux-amd64 && \
+    env bin_name=yq install_bin https://github.com/mikefarah/yq/releases/download/2.1.1/yq_linux_amd64
 RUN echo "DOCKER_IMAGE=ansible-test" >> /etc/os-release
 ENTRYPOINT ["/usr/local/bin/ansible-playbook"]
