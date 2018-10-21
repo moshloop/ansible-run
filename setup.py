@@ -4,8 +4,9 @@ from setuptools import setup, find_packages
 import os
 
 setup(
-    name = 'ansible-run', version = '3.3',
+    name = 'ansible-run', version = '3.4',
+    install_requires=['yq','jq'],
     url = 'https://www/github.com/moshloop/ansible-run',
-    author = 'Moshe Immerman', author_email = 'firstname.surname@gmail.com',
+    author = 'Moshe Immerman', author_email = 'moshe.immerman@gmail.com',
     scripts = ['ansible-run', 'ansible-test', 'ansible-role', 'ansible-vault-run']
     )
