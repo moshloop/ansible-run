@@ -1,5 +1,8 @@
 FROM %FROM%
 ARG ANSIBLE_VERSION
+ARG ANSIBLE_RUN_VERSION
+ARG ANSIBLE_DEPLOY_VERSION
+ARG ANSIBLE_EXTRAS_VERSION
 ARG SYSTOOLS_VERSION
 ARG PACKAGES
 ENV DEBIAN_FRONTEND=noninteractive
@@ -12,12 +15,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean
 RUN pip install --upgrade setuptools wheel && \
     pip install ansible==$ANSIBLE_VERSION ansible-dependencies[all] && \
-    pip install ansible-deploy==2.5.4 && \
-    pip install ansible-run==3.3 && \
+    pip install ansible-deploy==$ANSIBLE_DEPLOY_VERSION && \
+    pip install ansible-run==$ANSIBLE_RUN_VERSION && \
     wget -O systools.deb https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools.deb && dpkg -i systools.deb && \
     install_bin https://master.dockerproject.org/linux/x86_64/docker \
                 https://github.com/moshloop/waiter/releases/download/1.1/waiter && \
     install_deb https://packages.chef.io/files/stable/inspec/2.2.20/ubuntu/18.04/inspec_2.2.20-1_amd64.deb && \
-    install_deb https://github.com/moshloop/ansible-extras/releases/download/1.2/ansible-extras.deb && \
-    install_deb https://github.com/moshloop/ansible-deploy/releases/download/2.5.4/ansible-deploy.deb
+    install_deb https://github.com/moshloop/ansible-extras/releases/download/$ANSIBLE_EXTRAS_VERSION/ansible-extras.deb && \
+    bin_name=goss intall_bin https://github.com/aelsabbahy/goss/releases/download/v0.3.6/goss-linux-amd64
+RUN echo "DOCKER_IMAGE=ansible-test" > /etc/os-release
 ENTRYPOINT ["/usr/local/bin/ansible-playbook"]

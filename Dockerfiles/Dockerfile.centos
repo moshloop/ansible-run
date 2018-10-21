@@ -1,5 +1,8 @@
 FROM %FROM%
 ARG ANSIBLE_VERSION
+ARG ANSIBLE_RUN_VERSION
+ARG ANSIBLE_DEPLOY_VERSION
+ARG ANSIBLE_EXTRAS_VERSION
 ARG SYSTOOLS_VERSION
 ARG PACKAGES
 ENV container=docker
@@ -23,15 +26,17 @@ RUN yum makecache fast \
 
 RUN pip install --upgrade pip && pip install --upgrade setuptools wheel && \
     pip install ansible==$ANSIBLE_VERSION ansible-dependencies[all] && \
-    pip install ansible-run ansible-deploy
+    pip install ansible-run=$ANSIBLE_RUN_VERSION ansible-deploy==$ANSIBLE_DEPLOY_VERSION
 RUN rpm -i https://packages.chef.io/files/stable/inspec/2.3.4/el/7/inspec-2.3.4-1.el7.x86_64.rpm && \
-    rpm -i https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools-${SYSTOOLS_VERSION}-1.x86_64.rpm
+    rpm -i https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools.rpm && \
+    rpm -i https://github.com/moshloop/ansible-extras/releases/download/$ANSIBLE_EXTRAS_VERSION/ansible-extras.rpm
 RUN install_bin https://github.com/moshloop/waiter/releases/download/1.1/waiter \
-    https://master.dockerproject.org/linux/x86_64/docker
+                https://master.dockerproject.org/linux/x86_64/docker && \
+    bin_name=goss intall_bin https://github.com/aelsabbahy/goss/releases/download/v0.3.6/goss-linux-amd64
 
 RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 RUN mkdir -p /etc/ansible
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
-
+RUN echo "DOCKER_IMAGE=ansible-test" > /etc/os-release
 VOLUME ["/sys/fs/cgroup"]
 CMD ["/usr/sbin/init"]
