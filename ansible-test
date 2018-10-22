@@ -191,5 +191,10 @@ echo -e "$test_results"
 
 if [[ "$test_results" == *"$fail"* ]]; then
     printf ${red}"Some tests failed \n"${neutral}
+    if [[ "$-" == *"i"* ]]; then
+      open_debug_shell
+    else
+      journalctl --since="-1h" | grep -v DEBUG | grep -v INFO
+    fi
     exit 1
 fi
