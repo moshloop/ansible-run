@@ -57,19 +57,6 @@ fi
 
 
 install_dependencies() {
-  # extract and install role dependencies
-  if [[ -e "$PWD/meta/main.yml" ]]; then
-    dependencies=$(cat "$PWD/meta/main.yml" | yq -cr .galaxy_info.dependencies)
-
-    if [[ "$dependencies" != "null" ]]; then
-      dependencies=$(echo "$dependencies" | jq -j '. | join(" ") ')
-    fi
-    if [[ "$dependencies" != "null"  ]]; then
-      log "Installing role dependencies: " "$dependencies"
-      $EXEC ansible-galaxy install $dependencies
-    fi
-  fi
-
   requirements=$(dirname "$PWD/$playbook")"/requirements.yml"
   if [ -e "$requirements" ]; then
     log "Installing dependencies from: " "$requirements"
@@ -83,6 +70,7 @@ open_debug_shell() {
   height=$(stty size | cut -d" " -f1)
   tty_opts=$(stty -g)
   ARGS=" -e tty_width=$width -e tty_height=$height -e tty_opts=$tty_opts -e cid=$container_id"
+  echo "Opening debug shell"
   docker exec  $ARGS -it $container_id  bash -c "cd $PWD; bash"
   exit 0
 }
