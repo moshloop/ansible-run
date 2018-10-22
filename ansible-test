@@ -166,6 +166,7 @@ if [[ "$docker_image" == "ansible-test" ]]; then
 else
   container_id=${container_id:-$timestamp}
   log "Starting $image in the background:" "$container_id"
+  echo docker run --detach --name $container_id $(get_args) $image $entrypoint
   docker run --detach --name $container_id $(get_args) $image $entrypoint
   EXEC="docker exec --tty $container_id env TERM=xterm "
 fi
