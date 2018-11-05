@@ -32,12 +32,12 @@ RUN pip install --upgrade pip && pip install --upgrade setuptools wheel && \
     rpm -i https://packages.chef.io/files/stable/inspec/2.3.4/el/7/inspec-2.3.4-1.el7.x86_64.rpm && \
     rpm -i https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools.rpm && \
     rpm -i https://github.com/moshloop/ansible-extras/releases/download/$ANSIBLE_EXTRAS_VERSION/ansible-extras.rpm
-RUN install_bin https://github.com/moshloop/waiter/releases/download/1.1/waiter \
-                https://master.dockerproject.org/linux/x86_64/docker \
-                https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz \
-                https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl \
-                https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz \
-                https://github.com/kubernetes-sigs/kustomize/releases/download/v1.0.9/kustomize_1.0.9_linux_amd64 && \
+RUN install_bin https://master.dockerproject.org/linux/x86_64/docker && \
+    install_bin https://github.com/moshloop/waiter/releases/download/1.1/waiter && \
+    install_bin https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz && \
+    install_bin https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl && \
+    install_bin https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz && \
+    install_bin https://github.com/kubernetes-sigs/kustomize/releases/download/v1.0.9/kustomize_1.0.9_linux_amd64 && \
     env bin_name=goss install_bin https://github.com/aelsabbahy/goss/releases/download/v0.3.6/goss-linux-amd64  && \
     env bin_name=yq install_bin https://github.com/mikefarah/yq/releases/download/2.1.1/yq_linux_amd64
 
