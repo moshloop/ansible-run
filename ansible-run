@@ -16,6 +16,10 @@ if [[ -e ~/.aws ]]; then
     ARGS+=" -v $HOME/.aws:/root/.aws"
 fi
 
+if [[ -e ~/.kube ]]; then
+    ARGS+=" -v $HOME/.kube:/root/.kube"
+fi
+
 if [[ -e /work ]]; then
     ARGS+=" -v /work:/work "
 fi
@@ -35,4 +39,5 @@ if [[ "$@" == "" ]]; then
 else
     ARGS="$ARGS --entrypoint $ENTRYPOINT"
 fi
+echo docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run $@
 docker run --rm -it $ARGS -v $PWD:$PWD -w $PWD moshloop/docker-ansible-run $@
