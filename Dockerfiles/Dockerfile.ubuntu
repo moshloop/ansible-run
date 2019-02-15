@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -Rf /usr/share/doc && rm -Rf /usr/share/man && \
     apt-get clean
 RUN pip install --upgrade setuptools wheel && \
+    pip install bash-plus && \
     pip install ansible==$ANSIBLE_VERSION ansible-dependencies[all] && \
     pip install ansible-deploy==$ANSIBLE_DEPLOY_VERSION && \
     pip install ansible-run==$ANSIBLE_RUN_VERSION && \
