@@ -16,6 +16,10 @@ if [[ -e ~/.aws ]]; then
     ARGS+=" -v $HOME/.aws:/root/.aws"
 fi
 
+if [[ -e ~/.ssh ]]; then
+    ARGS+=" -v $HOME/.ssh:/root/.ssh"
+fi
+
 if [[ -e ~/.kube ]]; then
     ARGS+=" -v $HOME/.kube:/root/.kube"
 fi
