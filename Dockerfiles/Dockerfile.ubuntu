@@ -20,7 +20,7 @@ RUN pip install --upgrade setuptools wheel && \
     pip install ansible==$ANSIBLE_VERSION ansible-dependencies[all] && \
     pip install ansible-deploy==$ANSIBLE_DEPLOY_VERSION && \
     pip install ansible-run==$ANSIBLE_RUN_VERSION && \
-    pip install ansible-provision==$ANSIBLE_PROVISION_VERSION && ansible-provision install && \
+    pip install ansible-provision==$ANSIBLE_PROVISION_VERSION && \
     wget -O systools.deb https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools.deb && dpkg -i systools.deb && \
     install_bin https://master.dockerproject.org/linux/x86_64/docker && \
     install_bin https://github.com/moshloop/waiter/releases/download/1.1/waiter && \
