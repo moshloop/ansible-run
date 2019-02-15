@@ -11,8 +11,6 @@ git
 groff
 inetutils-ping
 jq
-kubeadm
-kubectl
 krb5-user
 libkrb5-3
 libkrb5-dev

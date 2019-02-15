@@ -6,6 +6,7 @@ ARG ANSIBLE_EXTRAS_VERSION
 ARG ANSIBLE_PROVISION_VERSION
 ARG SYSTOOLS_VERSION
 ARG PACKAGES
+ENV K8S_VER=v1.13.3
 ENV DEBIAN_FRONTEND=noninteractive
 ADD ansible.cfg /etc/ansible/ansible.cfg
 ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
@@ -24,8 +25,8 @@ RUN pip install --upgrade setuptools wheel && \
     install_bin https://master.dockerproject.org/linux/x86_64/docker && \
     install_bin https://github.com/moshloop/waiter/releases/download/1.1/waiter && \
     install_bin https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz && \
-    install_bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kubectl && \
-    install_bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kubeadm && \
+    install_bin https://storage.googleapis.com/kubernetes-release/release/$(K8S_VER)/bin/linux/amd64/kubectl && \
+     install_bin https://storage.googleapis.com/kubernetes-release/release/$(K8S_VER)/bin/linux/amd64/kubeadm && \
     install_bin https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz && \
     install_bin https://github.com/kubernetes-sigs/kustomize/releases/download/v1.0.9/kustomize_1.0.9_linux_amd64 && \
     install_deb https://packages.chef.io/files/stable/inspec/2.2.20/ubuntu/18.04/inspec_2.2.20-1_amd64.deb && \
